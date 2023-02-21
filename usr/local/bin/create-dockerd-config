@@ -31,9 +31,11 @@ def to_bool(value: Union[str, bool]) -> bool:
         "true": True,
         "t": True,
         "1": True,
+        "yes": True,
         "false": False,
         "f": False,
         "0": False,
+        "no": False,
     }
 
     if isinstance(value, bool):
@@ -77,14 +79,14 @@ if not docker_storage_driver:
 docker_config["default-address-pools"].append({"base": docker_ipv4_base, "size": int(docker_ipv4_size)})
 
 # Check if we need to enable IPv6 support
-if docker_ipv6:
+if docker_ipv6 and to_bool(docker_ipv6):
     docker_ipv6_base = os.getenv("DOCKER_IPV6_BASE", None)
-    if not docker_ipv4_size:
-        raise RuntimeError("Environment variable DOCKER_IPV4_SIZE must be defined when using IPv6")
+    if not docker_ipv6_base:
+        raise RuntimeError("Environment variable DOCKER_IPV6_BASE must be defined when using IPv6")
 
     docker_ipv6_size = os.getenv("DOCKER_IPV6_SIZE", None)
     if not docker_ipv6_size:
-        raise RuntimeError("Environment variable DOCKER_IPV4_SIZE must be defined when using IPv6")
+        raise RuntimeError("Environment variable DOCKER_IPV6_SIZE must be defined when using IPv6")
 
     docker_ipv6_fixed = os.getenv("DOCKER_IPV6_FIXED", None)
     if not docker_ipv6_base:
