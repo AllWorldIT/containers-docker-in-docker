@@ -28,7 +28,7 @@ chmod 0710 /var/lib/docker
 
 fdc_notice "Initializing Docker settings"
 
-export DOCKER_IPV4_BASE=${DOCKER_IPV4_BASE:-"172.17.0.0/16"}
+export DOCKER_IPV4_BASE=${DOCKER_IPV4_BASE:-"172.18.0.0/16"}
 export DOCKER_IPV4_SIZE=${DOCKER_IPV4_SIZE:-"27"}
 
 # Check if we're automatically going to enable IPv6 support
