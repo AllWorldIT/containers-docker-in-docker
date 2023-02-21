@@ -1,0 +1,4 @@
+include:
+  - project: 'gitlab/templates/containers'
+    ref: main
+    file: '/default.yml'

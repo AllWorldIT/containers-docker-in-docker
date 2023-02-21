@@ -1,0 +1,142 @@
+#!/usr/bin/python
+# Copyright (c) 2022-2023, AllWorldIT.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+import json
+import os
+from typing import Any, Union
+
+
+def to_bool(value: Union[str, bool]) -> bool:
+    """Convert string value to boolean."""
+
+    valid = {
+        "true": True,
+        "t": True,
+        "1": True,
+        "false": False,
+        "f": False,
+        "0": False,
+    }
+
+    if isinstance(value, bool):
+        return value
+
+    if not isinstance(value, str):
+        raise ValueError("Invalid literal for boolean")
+
+    lower_value = value.lower()
+    if lower_value in valid:
+        return valid[lower_value]
+    else:
+        raise ValueError(f'Invalid literal for boolean: "{value}"')
+
+
+# Initialize our docker configuration structure
+docker_config: dict[str, Any] = {}
+
+
+#
+# Work out IP addressing
+#
+
+docker_config["default-address-pools"] = []
+
+docker_ipv4_base = os.getenv("DOCKER_IPV4_BASE", None)
+if not docker_ipv4_base:
+    raise RuntimeError("Environment variable DOCKER_IPV4_BASE must be defined")
+
+docker_ipv4_size = os.getenv("DOCKER_IPV4_SIZE", None)
+if not docker_ipv4_size:
+    raise RuntimeError("Environment variable DOCKER_IPV4_SIZE must be defined")
+
+docker_ipv6 = os.getenv("DOCKER_IPV6", None)
+
+docker_storage_driver = os.getenv("DOCKER_STORAGE_DRIVER", None)
+if not docker_storage_driver:
+    raise RuntimeError("Environment variable DOCKER_STORAGE_DRIVER must be defined")
+
+# Configure IPv4
+docker_config["default-address-pools"].append({"base": docker_ipv4_base, "size": int(docker_ipv4_size)})
+
+# Check if we need to enable IPv6 support
+if docker_ipv6:
+    docker_ipv6_base = os.getenv("DOCKER_IPV6_BASE", None)
+    if not docker_ipv4_size:
+        raise RuntimeError("Environment variable DOCKER_IPV4_SIZE must be defined when using IPv6")
+
+    docker_ipv6_size = os.getenv("DOCKER_IPV6_SIZE", None)
+    if not docker_ipv6_size:
+        raise RuntimeError("Environment variable DOCKER_IPV4_SIZE must be defined when using IPv6")
+
+    docker_ipv6_fixed = os.getenv("DOCKER_IPV6_FIXED", None)
+    if not docker_ipv6_base:
+        raise RuntimeError("Environment variable DOCKER_IPV6_FIXED must be defined when using IPv6")
+
+    docker_config["ipv6"] = True
+    docker_config["default-address-pools"].append({"base": docker_ipv6_base, "size": int(docker_ipv6_size)})
+    docker_config["fixed-cidr-v6"] = docker_ipv6_fixed
+
+
+#
+# Certificate authentication
+#
+
+docker_tls_certdir = os.getenv("DOCKER_TLS_CERTDIR", None)
+if not docker_tls_certdir:
+    raise RuntimeError("Environment variable DOCKER_TLS_CERTDIR must be defined")
+
+docker_config["tls"] = True
+docker_config["tlsverify"] = True
+docker_config["tlscacert"] = f"{docker_tls_certdir}/server/ca.pem"
+docker_config["tlscert"] = f"{docker_tls_certdir}/server/cert.pem"
+docker_config["tlskey"] = f"{docker_tls_certdir}/server/key.pem"
+
+
+#
+# Other settings
+#
+
+docker_experimental = os.getenv("DOCKER_EXPERIMENTAL", False)
+
+if docker_experimental:
+    docker_config["experimental"] = to_bool(docker_experimental)
+
+# Disable iptables
+docker_config["iptables"] = False
+docker_config["ip6tables"] = False
+
+# Don't allow new privileges to be granted
+docker_config["no-new-privileges"] = True
+
+# Setup storage driver
+docker_config["storage-driver"] = docker_storage_driver
+
+# TODO
+#     "userns-remap": "",
+
+
+#
+# Config file generation
+#
+
+# Write out Docker daemon configuration
+with open("/etc/docker/daemon.json", "w") as dfile:
+    dfile.write(json.dumps(docker_config, sort_keys=True, indent=4) + "\n")
