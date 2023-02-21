@@ -31,7 +31,13 @@ fdc_notice "Initializing Docker settings"
 export DOCKER_IPV4_BASE=${DOCKER_IPV4_BASE:-"172.17.0.0/16"}
 export DOCKER_IPV4_SIZE=${DOCKER_IPV4_SIZE:-"27"}
 
-export DOCKER_IPV6=${DOCKER_IPV6:-"yes"}
+# Check if we're automatically going to enable IPv6 support
+DOCKER_IPV6_DEFAULT=no
+if [ -n "$(ip -6 route show default)" ]; then
+	DOCKER_IPV6_DEFAULT=yes
+fi
+export DOCKER_IPV6=${DOCKER_IPV6:-$DOCKER_IPV6_DEFAULT}
+
 export DOCKER_IPV6_BASE=${DOCKER_IPV6_BASE:-"64:ff9b:1::/96"}
 export DOCKER_IPV6_SIZE=${DOCKER_IPV6_SIZE:-"112"}
 export DOCKER_IPV6_FIXED=${DOCKER_IPV6_FIXED:-"$DOCKER_IPV6_BASE"}
@@ -60,6 +66,7 @@ if ! echo 1 > /proc/sys/net/ipv4/conf/default/forwarding; then
 fi
 fdc_notice "Enabling IPv4 masquerading"
 iptables --table nat --append POSTROUTING ! --out-interface docker0 -j MASQUERADE
+
 
 if [ -n "$DOCKER_IPV6" ] && [ "$DOCKER_IPV6" != "no" ]; then
 	fdc_notice "Enabling IPv6 forwarding"
