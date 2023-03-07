@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 
+
 fdc_notice "Setting up Docker permissions"
 # Make sure our data directory perms are correct
 chown root:root /var/lib/docker
