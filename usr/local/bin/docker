@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 set -a
+# shellcheck disable=SC1091
 . "/etc/docker/client.env"
 set +a
 
