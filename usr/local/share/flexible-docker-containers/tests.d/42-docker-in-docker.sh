@@ -60,3 +60,12 @@ if ! docker images; then
 	false
 fi
 fdc_test_pass docker-in-docker "Docker server responds over IPv6"
+
+
+# Test a docker container actually supports IPv6 when run
+fdc_test_start docker-in-docker "Check Docker container has IPv6 support"
+if ! docker run registry.conarx.tech/containers/alpine ip -6 route show default | grep -E 'default via'; then
+	fdc_test_fail docker-in-docker "Docker container has no IPv6 support"
+	false
+fi
+fdc_test_pass docker-in-docker "Docker container has IPv6 support"
