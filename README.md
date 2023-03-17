@@ -81,7 +81,7 @@ IPv6 base CIDR range. Defaults to "64:ff9b:1::/96".
 IPv6 block size. Defaults to "112" (/112).
 
 
-# DOCKER_IPV6_FIXED
+## DOCKER_IPV6_FIXED
 
 Fixed IPv6 address range. This should fit comfortably within the `DOCKER_IPV6_BASE`. Defaults to `DOCKER_IPV6_BASE` with a
 `DOCKER_IPV6_SIZE` mask.
