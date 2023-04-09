@@ -58,7 +58,7 @@ Additional environment variables are available from...
 
 ## DOCKER_IPV4_BASE
 
-IPv4 base CIDR range. Defaults to "172.17.0.0/16".
+IPv4 base CIDR range. Defaults to "172.31.0.0/16".
 
 
 ## DOCKER_IPV4_SIZE
@@ -73,7 +73,7 @@ Enable IPv6. It can be disabled using "no" as the value.
 
 ## DOCKER_IPV6_BASE
 
-IPv6 base CIDR range. Defaults to "64:ff9b:1::/96".
+IPv6 base CIDR range. Defaults to "64:ff9b:1:ffff::/96".
 
 
 ## DOCKER_IPV6_SIZE
