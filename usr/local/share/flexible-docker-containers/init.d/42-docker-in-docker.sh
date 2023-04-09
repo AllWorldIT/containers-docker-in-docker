@@ -29,7 +29,7 @@ chmod 0710 /var/lib/docker
 
 fdc_notice "Initializing Docker settings"
 
-export DOCKER_IPV4_BASE=${DOCKER_IPV4_BASE:-"172.18.0.0/16"}
+export DOCKER_IPV4_BASE=${DOCKER_IPV4_BASE:-"172.31.0.0/16"}
 export DOCKER_IPV4_SIZE=${DOCKER_IPV4_SIZE:-"27"}
 
 # Check if we're automatically going to enable IPv6 support
@@ -39,7 +39,8 @@ if [ -n "$(ip -6 route show default)" ]; then
 fi
 export DOCKER_IPV6=${DOCKER_IPV6:-$DOCKER_IPV6_DEFAULT}
 
-export DOCKER_IPV6_BASE=${DOCKER_IPV6_BASE:-"64:ff9b:1::/96"}
+# We use the local use v4/v6 per RFC 8215 for
+export DOCKER_IPV6_BASE=${DOCKER_IPV6_BASE:-"64:ff9b:1:ffff::/96"}
 export DOCKER_IPV6_SIZE=${DOCKER_IPV6_SIZE:-"112"}
 export DOCKER_IPV6_FIXED=${DOCKER_IPV6_FIXED:-"${DOCKER_IPV6_BASE%%/*}/${DOCKER_IPV6_SIZE}"}
 
