@@ -19,17 +19,17 @@
 # IN THE SOFTWARE.
 
 
-FROM registry.conarx.tech/containers/alpine/3.17
+FROM registry.conarx.tech/containers/alpine/3.18
 
 # 3.17 = 1.41
 # 3.18 = 1.42
-ENV DOCKER_API_VERSION=1.41
+ENV DOCKER_API_VERSION=1.42
 
 
 ARG VERSION_INFO=
 LABEL org.opencontainers.image.authors   "Nigel Kukard <nkukard@conarx.tech>"
-LABEL org.opencontainers.image.version   "3.17"
-LABEL org.opencontainers.image.base.name "registry.conarx.tech/containers/alpine/3.17"
+LABEL org.opencontainers.image.version   "3.18"
+LABEL org.opencontainers.image.base.name "registry.conarx.tech/containers/alpine/3.18"
 
 
 
