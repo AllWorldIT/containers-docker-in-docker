@@ -66,14 +66,14 @@ if ! echo 1 > /proc/sys/net/ipv4/conf/default/forwarding; then
 	false
 fi
 fdc_notice "Enabling IPv4 masquerading"
-iptables --table nat --append POSTROUTING ! --out-interface docker0 -j MASQUERADE
+iptables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
 
 
 if [ -n "$DOCKER_IPV6" ] && [ "$DOCKER_IPV6" != "no" ]; then
 	fdc_notice "Enabling IPv6 forwarding"
 	echo 1 > /proc/sys/net/ipv6/conf/default/forwarding
 	fdc_notice "Enabling IPv6 masquerading"
-	ip6tables --table nat --append POSTROUTING ! --out-interface docker0 -j MASQUERADE
+	ip6tables --table nat --append POSTROUTING --out-interface eth0 -j MASQUERADE
 else
 	fdc_notice "IPv6 not enabled"
 fi
